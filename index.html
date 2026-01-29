@@ -3,44 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hockey Game</title>
+    <title>CORAL TEAM Hockey</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
         body {
             margin: 0;
             overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
         }
         #gameCanvas {
             display: block;
-            background: linear-gradient(180deg, #e8f4f8 0%, #d4e8f0 100%);
+            background: radial-gradient(ellipse at center, #f0f9ff 0%, #bae6fd 50%, #7dd3fc 100%);
+        }
+        .glow-text {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                         0 0 20px rgba(6, 182, 212, 0.6),
+                         0 0 30px rgba(6, 182, 212, 0.4);
+        }
+        .coral-gradient {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ffa06b 50%, #ff6b9d 100%);
+        }
+        .neon-border {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.5),
+                        0 0 30px rgba(6, 182, 212, 0.3),
+                        inset 0 0 15px rgba(6, 182, 212, 0.2);
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(6, 182, 212, 0.8); }
+        }
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
         }
     </style>
 </head>
-<body class="bg-gray-900">
-    <div class="fixed top-0 left-0 right-0 bg-gray-800 text-white p-4 shadow-lg z-10">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <div class="text-center flex-1">
-                <h2 class="text-2xl font-bold text-blue-400">Team Blue</h2>
-                <p class="text-4xl font-bold mt-2" id="blueScore">0</p>
+<body class="bg-gradient-to-br from-gray-900 via-cyan-900 to-gray-900">
+    <div class="fixed top-0 left-0 right-0 coral-gradient text-white p-6 shadow-2xl z-10 neon-border">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-4">
+                <div class="text-center flex-1">
+                    <h2 class="text-3xl font-black text-cyan-100 glow-text">🌊 CORAL TEAM</h2>
+                    <p class="text-5xl font-black mt-2 glow-text" id="coralScore">0</p>
+                </div>
+                <div class="text-center px-8">
+                    <h1 class="text-4xl font-black glow-text">🏒 CORAL TEAM HOCKEY ⚡</h1>
+                    <p class="text-sm mt-1 text-cyan-100">Elite Ice Arena</p>
+                </div>
+                <div class="text-center flex-1">
+                    <h2 class="text-3xl font-black text-purple-100 glow-text">⚡ STORM TEAM</h2>
+                    <p class="text-5xl font-black mt-2 glow-text" id="stormScore">0</p>
+                </div>
             </div>
-            <div class="text-center px-8">
-                <h1 class="text-3xl font-bold">🏒 Hockey Game</h1>
-                <button id="startBtn" class="mt-2 bg-green-500 hover:bg-green-600 px-6 py-2 rounded-lg font-bold">
-                    Start Game
+            
+            <div class="flex justify-center items-center gap-4" id="menuControls">
+                <button id="vsPlayerBtn" class="bg-cyan-500 hover:bg-cyan-400 px-8 py-3 rounded-xl font-black text-xl shadow-lg pulse-glow transform hover:scale-105 transition">
+                    👥 VS PLAYER
+                </button>
+                <button id="vsComputerBtn" class="bg-purple-500 hover:bg-purple-400 px-8 py-3 rounded-xl font-black text-xl shadow-lg pulse-glow transform hover:scale-105 transition">
+                    🤖 VS COMPUTER
                 </button>
             </div>
-            <div class="text-center flex-1">
-                <h2 class="text-2xl font-bold text-red-400">Team Red</h2>
-                <p class="text-4xl font-bold mt-2" id="redScore">0</p>
+            
+            <div class="text-center mt-2 hidden" id="gameStatus">
+                <p class="text-xl font-bold glow-text" id="statusText">Game Starting...</p>
             </div>
         </div>
     </div>
 
-    <div class="fixed bottom-4 left-4 bg-gray-800 text-white p-4 rounded-lg shadow-lg z-10">
-        <h3 class="font-bold mb-2">Controls:</h3>
-        <p class="text-sm"><strong>Player 1 (Blue):</strong> WASD to move</p>
-        <p class="text-sm"><strong>Player 2 (Red):</strong> Arrow keys to move</p>
-        <p class="text-sm mt-2">💡 Push the puck into the opponent's goal!</p>
+    <div class="fixed bottom-4 left-4 bg-gradient-to-br from-gray-900 to-cyan-900 text-white p-6 rounded-2xl shadow-2xl z-10 neon-border border-2 border-cyan-400">
+        <h3 class="font-black text-xl mb-3 glow-text">⚡ CONTROLS</h3>
+        <div class="space-y-2 text-sm">
+            <p><strong class="text-cyan-300">🌊 Coral (P1):</strong> <span class="text-cyan-100">WASD keys</span></p>
+            <p><strong class="text-purple-300">⚡ Storm (P2):</strong> <span class="text-purple-100">Arrow keys</span></p>
+            <p class="mt-3 pt-3 border-t border-cyan-700"><strong class="text-yellow-300">🏆 Goal:</strong> Push puck into opponent's net!</p>
+        </div>
+    </div>
+
+    <div class="fixed bottom-4 right-4 bg-gradient-to-br from-gray-900 to-purple-900 text-white p-6 rounded-2xl shadow-2xl z-10 neon-border border-2 border-purple-400" id="playerList">
+        <h3 class="font-black text-xl mb-3 glow-text">👥 PLAYERS</h3>
+        <div class="space-y-2 text-sm" id="activePlayers">
+            <p class="text-cyan-300">🌊 Coral Team: <span id="coralStatus">Waiting...</span></p>
+            <p class="text-purple-300">⚡ Storm Team: <span id="stormStatus">Waiting...</span></p>
+        </div>
     </div>
 
     <canvas id="gameCanvas"></canvas>
@@ -48,9 +94,15 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const startBtn = document.getElementById('startBtn');
-        const blueScoreEl = document.getElementById('blueScore');
-        const redScoreEl = document.getElementById('redScore');
+        const vsPlayerBtn = document.getElementById('vsPlayerBtn');
+        const vsComputerBtn = document.getElementById('vsComputerBtn');
+        const menuControls = document.getElementById('menuControls');
+        const gameStatus = document.getElementById('gameStatus');
+        const statusText = document.getElementById('statusText');
+        const coralScoreEl = document.getElementById('coralScore');
+        const stormScoreEl = document.getElementById('stormScore');
+        const coralStatusEl = document.getElementById('coralStatus');
+        const stormStatusEl = document.getElementById('stormStatus');
 
         // Set canvas size
         function resizeCanvas() {
@@ -62,8 +114,41 @@
 
         // Game state
         let gameStarted = false;
-        let blueScore = 0;
-        let redScore = 0;
+        let gameMode = null; // 'player' or 'computer'
+        let coralScore = 0;
+        let stormScore = 0;
+        let particles = [];
+
+        // Particle system for effects
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 8;
+                this.vy = (Math.random() - 0.5) * 8;
+                this.life = 1;
+                this.decay = 0.02;
+                this.size = Math.random() * 4 + 2;
+                this.color = color;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+                this.vx *= 0.98;
+                this.vy *= 0.98;
+            }
+
+            draw() {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
 
         // Game objects
         const puck = {
@@ -73,30 +158,93 @@
             vx: 0,
             vy: 0,
             friction: 0.98,
-            color: '#1a1a1a'
+            color: '#1a1a1a',
+            trail: []
         };
 
-        const player1 = {
+        const coralPlayer = {
             x: canvas.width / 4,
             y: canvas.height / 2,
-            radius: 25,
-            speed: 5,
-            color: '#3b82f6',
-            keys: { w: false, a: false, s: false, d: false }
+            radius: 28,
+            speed: 5.5,
+            color: '#06b6d4',
+            accentColor: '#ff6b9d',
+            keys: { w: false, a: false, s: false, d: false },
+            name: 'Coral'
         };
 
-        const player2 = {
+        const stormPlayer = {
             x: (canvas.width / 4) * 3,
             y: canvas.height / 2,
-            radius: 25,
-            speed: 5,
-            color: '#ef4444',
-            keys: { up: false, left: false, down: false, right: false }
+            radius: 28,
+            speed: 5.5,
+            color: '#a855f7',
+            accentColor: '#fbbf24',
+            keys: { up: false, left: false, down: false, right: false },
+            name: 'Storm',
+            isAI: false
         };
 
+        // AI behavior
+        const ai = {
+            updateInterval: 50, // ms between AI decisions
+            lastUpdate: 0,
+            targetX: 0,
+            targetY: 0,
+            reactDistance: 300
+        };
+
+        function updateAI() {
+            if (!stormPlayer.isAI || !gameStarted) return;
+
+            const now = Date.now();
+            if (now - ai.lastUpdate < ai.updateInterval) return;
+            ai.lastUpdate = now;
+
+            // Calculate distance to puck
+            const dx = puck.x - stormPlayer.x;
+            const dy = puck.y - stormPlayer.y;
+            const distanceToPuck = Math.sqrt(dx * dx + dy * dy);
+
+            // Defensive position
+            const defensiveX = canvas.width * 0.75;
+            const defensiveY = canvas.height / 2;
+
+            if (distanceToPuck < ai.reactDistance || puck.x > canvas.width / 2) {
+                // Chase puck if it's close or on their side
+                ai.targetX = puck.x;
+                ai.targetY = puck.y;
+            } else {
+                // Return to defensive position
+                ai.targetX = defensiveX;
+                ai.targetY = defensiveY;
+            }
+
+            // Move towards target
+            const targetDx = ai.targetX - stormPlayer.x;
+            const targetDy = ai.targetY - stormPlayer.y;
+            const distanceToTarget = Math.sqrt(targetDx * targetDx + targetDy * targetDy);
+
+            // Clear all keys first
+            stormPlayer.keys.up = false;
+            stormPlayer.keys.down = false;
+            stormPlayer.keys.left = false;
+            stormPlayer.keys.right = false;
+
+            if (distanceToTarget > 20) {
+                if (Math.abs(targetDx) > Math.abs(targetDy)) {
+                    stormPlayer.keys.right = targetDx > 0;
+                    stormPlayer.keys.left = targetDx < 0;
+                } else {
+                    stormPlayer.keys.down = targetDy > 0;
+                    stormPlayer.keys.up = targetDy < 0;
+                }
+            }
+        }
+
         // Goals
-        const goalWidth = 20;
-        const goalHeight = 150;
+        const goalWidth = 25;
+        const goalHeight = 160;
         const leftGoal = {
             x: 0,
             y: (canvas.height - goalHeight) / 2,
@@ -114,60 +262,76 @@
         document.addEventListener('keydown', (e) => {
             if (!gameStarted) return;
             
-            // Player 1
-            if (e.key === 'w') player1.keys.w = true;
-            if (e.key === 'a') player1.keys.a = true;
-            if (e.key === 's') player1.keys.s = true;
-            if (e.key === 'd') player1.keys.d = true;
+            // Player 1 (Coral)
+            if (e.key === 'w') coralPlayer.keys.w = true;
+            if (e.key === 'a') coralPlayer.keys.a = true;
+            if (e.key === 's') coralPlayer.keys.s = true;
+            if (e.key === 'd') coralPlayer.keys.d = true;
             
-            // Player 2
-            if (e.key === 'ArrowUp') player2.keys.up = true;
-            if (e.key === 'ArrowLeft') player2.keys.left = true;
-            if (e.key === 'ArrowDown') player2.keys.down = true;
-            if (e.key === 'ArrowRight') player2.keys.right = true;
+            // Player 2 (Storm) - only if not AI
+            if (!stormPlayer.isAI) {
+                if (e.key === 'ArrowUp') stormPlayer.keys.up = true;
+                if (e.key === 'ArrowLeft') stormPlayer.keys.left = true;
+                if (e.key === 'ArrowDown') stormPlayer.keys.down = true;
+                if (e.key === 'ArrowRight') stormPlayer.keys.right = true;
+            }
         });
 
         document.addEventListener('keyup', (e) => {
-            // Player 1
-            if (e.key === 'w') player1.keys.w = false;
-            if (e.key === 'a') player1.keys.a = false;
-            if (e.key === 's') player1.keys.s = false;
-            if (e.key === 'd') player1.keys.d = false;
+            // Player 1 (Coral)
+            if (e.key === 'w') coralPlayer.keys.w = false;
+            if (e.key === 'a') coralPlayer.keys.a = false;
+            if (e.key === 's') coralPlayer.keys.s = false;
+            if (e.key === 'd') coralPlayer.keys.d = false;
             
-            // Player 2
-            if (e.key === 'ArrowUp') player2.keys.up = false;
-            if (e.key === 'ArrowLeft') player2.keys.left = false;
-            if (e.key === 'ArrowDown') player2.keys.down = false;
-            if (e.key === 'ArrowRight') player2.keys.right = false;
+            // Player 2 (Storm) - only if not AI
+            if (!stormPlayer.isAI) {
+                if (e.key === 'ArrowUp') stormPlayer.keys.up = false;
+                if (e.key === 'ArrowLeft') stormPlayer.keys.left = false;
+                if (e.key === 'ArrowDown') stormPlayer.keys.down = false;
+                if (e.key === 'ArrowRight') stormPlayer.keys.right = false;
+            }
         });
 
-        startBtn.addEventListener('click', () => {
-            gameStarted = true;
-            startBtn.textContent = 'Game On!';
-            startBtn.disabled = true;
-            startBtn.classList.add('opacity-50');
+        // Game mode selection
+        vsPlayerBtn.addEventListener('click', () => {
+            gameMode = 'player';
+            stormPlayer.isAI = false;
+            startGame();
         });
+
+        vsComputerBtn.addEventListener('click', () => {
+            gameMode = 'computer';
+            stormPlayer.isAI = true;
+            startGame();
+        });
+
+        function startGame() {
+            gameStarted = true;
+            menuControls.classList.add('hidden');
+            gameStatus.classList.remove('hidden');
+            
+            coralStatusEl.textContent = 'Human Player';
+            stormStatusEl.textContent = stormPlayer.isAI ? '🤖 AI Player' : 'Human Player';
+            
+            statusText.textContent = `${gameMode === 'player' ? 'VS PLAYER' : 'VS COMPUTER'} MODE`;
+            
+            setTimeout(() => {
+                statusText.textContent = 'GAME ON! 🏒';
+            }, 1500);
+        }
 
         function updatePlayer(player) {
-            // Player 1 movement
-            if (player === player1) {
-                if (player.keys.w) player.y -= player.speed;
-                if (player.keys.s) player.y += player.speed;
-                if (player.keys.a) player.x -= player.speed;
-                if (player.keys.d) player.x += player.speed;
-            }
-            
-            // Player 2 movement
-            if (player === player2) {
-                if (player.keys.up) player.y -= player.speed;
-                if (player.keys.down) player.y += player.speed;
-                if (player.keys.left) player.x -= player.speed;
-                if (player.keys.right) player.x += player.speed;
-            }
+            // Update based on key states
+            if (player.keys.w || player.keys.up) player.y -= player.speed;
+            if (player.keys.s || player.keys.down) player.y += player.speed;
+            if (player.keys.a || player.keys.left) player.x -= player.speed;
+            if (player.keys.d || player.keys.right) player.x += player.speed;
 
             // Keep player in bounds
+            const headerOffset = 150;
             player.x = Math.max(player.radius, Math.min(canvas.width - player.radius, player.x));
-            player.y = Math.max(100 + player.radius, Math.min(canvas.height - player.radius, player.y));
+            player.y = Math.max(headerOffset + player.radius, Math.min(canvas.height - player.radius, player.y));
         }
 
         function checkCollision(obj1, obj2) {
@@ -193,14 +357,23 @@
                     puck.y += normalY * overlap;
                     
                     // Transfer momentum to puck
-                    const force = 8;
+                    const force = 10;
                     puck.vx = normalX * force;
                     puck.vy = normalY * force;
+
+                    // Create particles on hit
+                    for (let i = 0; i < 10; i++) {
+                        particles.push(new Particle(puck.x, puck.y, player.color));
+                    }
                 }
             }
         }
 
         function updatePuck() {
+            // Add trail
+            puck.trail.push({ x: puck.x, y: puck.y });
+            if (puck.trail.length > 15) puck.trail.shift();
+
             puck.x += puck.vx;
             puck.y += puck.vy;
             
@@ -213,16 +386,23 @@
             if (Math.abs(puck.vy) < 0.1) puck.vy = 0;
             
             // Bounce off top and bottom walls
-            if (puck.y - puck.radius < 100 || puck.y + puck.radius > canvas.height) {
+            const headerOffset = 150;
+            if (puck.y - puck.radius < headerOffset || puck.y + puck.radius > canvas.height) {
                 puck.vy *= -0.8;
-                puck.y = puck.y - puck.radius < 100 ? 100 + puck.radius : canvas.height - puck.radius;
+                puck.y = puck.y - puck.radius < headerOffset ? headerOffset + puck.radius : canvas.height - puck.radius;
+                
+                // Bounce particles
+                for (let i = 0; i < 5; i++) {
+                    particles.push(new Particle(puck.x, puck.y, '#ffffff'));
+                }
             }
             
             // Check goals
             if (puck.x - puck.radius < goalWidth) {
                 if (puck.y > leftGoal.y && puck.y < leftGoal.y + leftGoal.height) {
-                    redScore++;
-                    redScoreEl.textContent = redScore;
+                    stormScore++;
+                    stormScoreEl.textContent = stormScore;
+                    celebrateGoal(stormPlayer.color);
                     resetPuck();
                 } else {
                     puck.vx *= -0.8;
@@ -232,8 +412,9 @@
             
             if (puck.x + puck.radius > canvas.width - goalWidth) {
                 if (puck.y > rightGoal.y && puck.y < rightGoal.y + rightGoal.height) {
-                    blueScore++;
-                    blueScoreEl.textContent = blueScore;
+                    coralScore++;
+                    coralScoreEl.textContent = coralScore;
+                    celebrateGoal(coralPlayer.color);
                     resetPuck();
                 } else {
                     puck.vx *= -0.8;
@@ -242,82 +423,220 @@
             }
         }
 
+        function celebrateGoal(color) {
+            // Create goal celebration particles
+            for (let i = 0; i < 100; i++) {
+                particles.push(new Particle(canvas.width / 2, canvas.height / 2, color));
+            }
+            statusText.textContent = '⚡ GOAL! ⚡';
+            setTimeout(() => {
+                statusText.textContent = 'GAME ON! 🏒';
+            }, 2000);
+        }
+
         function resetPuck() {
             puck.x = canvas.width / 2;
             puck.y = canvas.height / 2;
             puck.vx = 0;
             puck.vy = 0;
+            puck.trail = [];
         }
 
         function drawRink() {
-            // Ice rink
-            ctx.fillStyle = '#e8f4f8';
-            ctx.fillRect(0, 100, canvas.width, canvas.height - 100);
+            const headerOffset = 150;
             
-            // Center line
-            ctx.strokeStyle = '#0066cc';
-            ctx.lineWidth = 3;
-            ctx.setLineDash([20, 10]);
+            // Ice rink with gradient
+            const gradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
+            gradient.addColorStop(0, '#f0f9ff');
+            gradient.addColorStop(0.5, '#e0f2fe');
+            gradient.addColorStop(1, '#bae6fd');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, headerOffset, canvas.width, canvas.height - headerOffset);
+            
+            // Blue lines (defensive zones)
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 4;
             ctx.beginPath();
-            ctx.moveTo(canvas.width / 2, 100);
+            ctx.moveTo(canvas.width * 0.25, headerOffset);
+            ctx.lineTo(canvas.width * 0.25, canvas.height);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(canvas.width * 0.75, headerOffset);
+            ctx.lineTo(canvas.width * 0.75, canvas.height);
+            ctx.stroke();
+            
+            // Center line with dotted pattern
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 5;
+            ctx.setLineDash([20, 15]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, headerOffset);
             ctx.lineTo(canvas.width / 2, canvas.height);
             ctx.stroke();
             ctx.setLineDash([]);
             
             // Center circle
-            ctx.strokeStyle = '#0066cc';
-            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 4;
             ctx.beginPath();
-            ctx.arc(canvas.width / 2, canvas.height / 2, 80, 0, Math.PI * 2);
+            ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, Math.PI * 2);
             ctx.stroke();
             
-            // Goals
+            // Center dot
             ctx.fillStyle = '#dc2626';
-            ctx.fillRect(leftGoal.x, leftGoal.y, leftGoal.width, leftGoal.height);
-            ctx.strokeStyle = '#991b1b';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(leftGoal.x, leftGoal.y, leftGoal.width, leftGoal.height);
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, 8, 0, Math.PI * 2);
+            ctx.fill();
             
-            ctx.fillStyle = '#2563eb';
-            ctx.fillRect(rightGoal.x, rightGoal.y, rightGoal.width, rightGoal.height);
-            ctx.strokeStyle = '#1e40af';
-            ctx.strokeRect(rightGoal.x, rightGoal.y, rightGoal.width, rightGoal.height);
+            // Face-off circles
+            drawFaceoffCircle(canvas.width * 0.25, canvas.height * 0.35);
+            drawFaceoffCircle(canvas.width * 0.25, canvas.height * 0.65);
+            drawFaceoffCircle(canvas.width * 0.75, canvas.height * 0.35);
+            drawFaceoffCircle(canvas.width * 0.75, canvas.height * 0.65);
+            
+            // Goals with fancy design
+            drawGoal(leftGoal, coralPlayer.color);
+            drawGoal(rightGoal, stormPlayer.color);
+        }
+
+        function drawFaceoffCircle(x, y) {
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(x, y, 30, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#dc2626';
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawGoal(goal, color) {
+            // Goal net effect
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.3;
+            ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+            ctx.globalAlpha = 1;
+            
+            // Goal frame
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 6;
+            ctx.strokeRect(goal.x, goal.y, goal.width, goal.height);
+            
+            // Net pattern
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.5;
+            for (let i = 0; i < goal.height; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(goal.x, goal.y + i);
+                ctx.lineTo(goal.x + goal.width, goal.y + i);
+                ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
         }
 
         function drawPlayer(player) {
-            // Player shadow
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            // Glow effect
+            const glowGradient = ctx.createRadialGradient(player.x, player.y, player.radius * 0.5, player.x, player.y, player.radius * 2);
+            glowGradient.addColorStop(0, player.color + '80');
+            glowGradient.addColorStop(1, player.color + '00');
+            ctx.fillStyle = glowGradient;
             ctx.beginPath();
-            ctx.arc(player.x + 3, player.y + 3, player.radius, 0, Math.PI * 2);
+            ctx.arc(player.x, player.y, player.radius * 2, 0, Math.PI * 2);
             ctx.fill();
             
-            // Player
-            ctx.fillStyle = player.color;
+            // Player shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+            ctx.beginPath();
+            ctx.arc(player.x + 4, player.y + 4, player.radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Player body with gradient
+            const playerGradient = ctx.createRadialGradient(player.x - 5, player.y - 5, 0, player.x, player.y, player.radius);
+            playerGradient.addColorStop(0, player.accentColor);
+            playerGradient.addColorStop(1, player.color);
+            ctx.fillStyle = playerGradient;
             ctx.beginPath();
             ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
             ctx.fill();
             
+            // Player outline
             ctx.strokeStyle = 'white';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            
+            // Inner detail
+            ctx.strokeStyle = player.accentColor;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.radius * 0.6, 0, Math.PI * 2);
             ctx.stroke();
         }
 
         function drawPuck() {
-            // Puck shadow
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            // Puck trail
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.3;
             ctx.beginPath();
-            ctx.arc(puck.x + 2, puck.y + 2, puck.radius, 0, Math.PI * 2);
+            for (let i = 0; i < puck.trail.length; i++) {
+                const point = puck.trail[i];
+                if (i === 0) {
+                    ctx.moveTo(point.x, point.y);
+                } else {
+                    ctx.lineTo(point.x, point.y);
+                }
+            }
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+            
+            // Puck shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.beginPath();
+            ctx.arc(puck.x + 3, puck.y + 3, puck.radius, 0, Math.PI * 2);
             ctx.fill();
             
-            // Puck
+            // Puck glow
+            const puckGlow = ctx.createRadialGradient(puck.x, puck.y, 0, puck.x, puck.y, puck.radius * 2);
+            puckGlow.addColorStop(0, '#ffffff40');
+            puckGlow.addColorStop(1, '#ffffff00');
+            ctx.fillStyle = puckGlow;
+            ctx.beginPath();
+            ctx.arc(puck.x, puck.y, puck.radius * 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Puck body
             ctx.fillStyle = puck.color;
             ctx.beginPath();
             ctx.arc(puck.x, puck.y, puck.radius, 0, Math.PI * 2);
             ctx.fill();
             
+            // Puck details
             ctx.strokeStyle = '#666';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             ctx.stroke();
+            
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(puck.x, puck.y, puck.radius * 0.5, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        function updateParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        function drawParticles() {
+            particles.forEach(particle => particle.draw());
         }
 
         function gameLoop() {
@@ -328,22 +647,29 @@
             drawRink();
             
             if (gameStarted) {
+                // Update AI
+                updateAI();
+                
                 // Update players
-                updatePlayer(player1);
-                updatePlayer(player2);
+                updatePlayer(coralPlayer);
+                updatePlayer(stormPlayer);
                 
                 // Update puck
                 updatePuck();
                 
                 // Check collisions
-                handlePlayerPuckCollision(player1, puck);
-                handlePlayerPuckCollision(player2, puck);
+                handlePlayerPuckCollision(coralPlayer, puck);
+                handlePlayerPuckCollision(stormPlayer, puck);
+                
+                // Update particles
+                updateParticles();
             }
             
             // Draw game objects
+            drawParticles();
             drawPuck();
-            drawPlayer(player1);
-            drawPlayer(player2);
+            drawPlayer(coralPlayer);
+            drawPlayer(stormPlayer);
             
             requestAnimationFrame(gameLoop);
         }
