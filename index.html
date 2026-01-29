@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORAL TEAM Hockey</title>
+    <title>CORAL TEAM Hockey - Multiplayer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
@@ -40,12 +40,14 @@
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-900 via-cyan-900 to-gray-900">
+    <!-- Header -->
     <div class="fixed top-0 left-0 right-0 coral-gradient text-white p-6 shadow-2xl z-10 neon-border">
         <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-center mb-4">
                 <div class="text-center flex-1">
                     <h2 class="text-3xl font-black text-cyan-100 glow-text">🌊 CORAL TEAM</h2>
                     <p class="text-5xl font-black mt-2 glow-text" id="coralScore">0</p>
+                    <p class="text-xs mt-1 text-cyan-200" id="coralPlayerCount">0 players</p>
                 </div>
                 <div class="text-center px-8">
                     <h1 class="text-4xl font-black glow-text">🏒 CORAL TEAM HOCKEY ⚡</h1>
@@ -54,15 +56,13 @@
                 <div class="text-center flex-1">
                     <h2 class="text-3xl font-black text-purple-100 glow-text">⚡ STORM TEAM</h2>
                     <p class="text-5xl font-black mt-2 glow-text" id="stormScore">0</p>
+                    <p class="text-xs mt-1 text-purple-200" id="stormPlayerCount">0 players</p>
                 </div>
             </div>
             
             <div class="flex justify-center items-center gap-4" id="menuControls">
-                <button id="vsPlayerBtn" class="bg-cyan-500 hover:bg-cyan-400 px-8 py-3 rounded-xl font-black text-xl shadow-lg pulse-glow transform hover:scale-105 transition">
-                    👥 VS PLAYER
-                </button>
-                <button id="vsComputerBtn" class="bg-purple-500 hover:bg-purple-400 px-8 py-3 rounded-xl font-black text-xl shadow-lg pulse-glow transform hover:scale-105 transition">
-                    🤖 VS COMPUTER
+                <button id="setupGameBtn" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 px-10 py-4 rounded-xl font-black text-2xl shadow-lg pulse-glow transform hover:scale-105 transition">
+                    🎮 SETUP GAME
                 </button>
             </div>
             
@@ -72,39 +72,134 @@
         </div>
     </div>
 
-    <div class="fixed bottom-4 left-4 bg-gradient-to-br from-gray-900 to-cyan-900 text-white p-6 rounded-2xl shadow-2xl z-10 neon-border border-2 border-cyan-400">
-        <h3 class="font-black text-xl mb-3 glow-text">⚡ CONTROLS</h3>
-        <div class="space-y-2 text-sm">
-            <p><strong class="text-cyan-300">🌊 Coral (P1):</strong> <span class="text-cyan-100">WASD keys</span></p>
-            <p><strong class="text-purple-300">⚡ Storm (P2):</strong> <span class="text-purple-100">Arrow keys</span></p>
-            <p class="mt-3 pt-3 border-t border-cyan-700"><strong class="text-yellow-300">🏆 Goal:</strong> Push puck into opponent's net!</p>
+    <!-- Player Setup Modal -->
+    <div id="setupModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 hidden">
+        <div class="bg-gradient-to-br from-gray-900 via-cyan-900 to-gray-900 p-8 rounded-3xl shadow-2xl max-w-5xl w-full mx-4 neon-border border-4 border-cyan-400 max-h-[90vh] overflow-y-auto">
+            <h2 class="text-4xl font-black text-center mb-6 glow-text">⚡ GAME SETUP ⚡</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Coral Team Setup -->
+                <div class="bg-gradient-to-br from-cyan-800 to-cyan-900 p-6 rounded-2xl border-2 border-cyan-400">
+                    <h3 class="text-2xl font-black text-cyan-100 mb-4 text-center">🌊 CORAL TEAM</h3>
+                    <div class="space-y-3 mb-4" id="coralPlayersList"></div>
+                    <button id="addCoralPlayer" class="w-full bg-cyan-500 hover:bg-cyan-400 px-4 py-3 rounded-lg font-bold transition transform hover:scale-105">
+                        ➕ Add Player (Max 4)
+                    </button>
+                </div>
+
+                <!-- Storm Team Setup -->
+                <div class="bg-gradient-to-br from-purple-800 to-purple-900 p-6 rounded-2xl border-2 border-purple-400">
+                    <h3 class="text-2xl font-black text-purple-100 mb-4 text-center">⚡ STORM TEAM</h3>
+                    <div class="space-y-3 mb-4" id="stormPlayersList"></div>
+                    <button id="addStormPlayer" class="w-full bg-purple-500 hover:bg-purple-400 px-4 py-3 rounded-lg font-bold transition transform hover:scale-105">
+                        ➕ Add Player (Max 4)
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-yellow-800 to-orange-800 p-4 rounded-xl mb-6 border-2 border-yellow-400">
+                <h3 class="text-xl font-bold text-yellow-100 mb-3 text-center">🤖 AI PLAYERS</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <label class="flex items-center justify-center gap-2 cursor-pointer bg-black bg-opacity-30 p-3 rounded-lg hover:bg-opacity-50 transition">
+                        <input type="checkbox" id="coralAI" class="w-5 h-5">
+                        <span class="font-bold text-cyan-100">Add AI to Coral</span>
+                    </label>
+                    <label class="flex items-center justify-center gap-2 cursor-pointer bg-black bg-opacity-30 p-3 rounded-lg hover:bg-opacity-50 transition">
+                        <input type="checkbox" id="stormAI" class="w-5 h-5">
+                        <span class="font-bold text-purple-100">Add AI to Storm</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex gap-4">
+                <button id="startGameBtn" class="flex-1 bg-green-500 hover:bg-green-400 px-8 py-4 rounded-xl font-black text-2xl shadow-lg transform hover:scale-105 transition">
+                    🏒 START GAME
+                </button>
+                <button id="cancelSetupBtn" class="flex-1 bg-red-500 hover:bg-red-400 px-8 py-4 rounded-xl font-black text-2xl shadow-lg transform hover:scale-105 transition">
+                    ❌ CANCEL
+                </button>
+            </div>
+
+            <div class="mt-4 text-center">
+                <button id="clearDataBtn" class="text-sm text-gray-400 hover:text-white underline transition">
+                    Clear All Saved Data
+                </button>
+            </div>
         </div>
     </div>
 
-    <div class="fixed bottom-4 right-4 bg-gradient-to-br from-gray-900 to-purple-900 text-white p-6 rounded-2xl shadow-2xl z-10 neon-border border-2 border-purple-400" id="playerList">
-        <h3 class="font-black text-xl mb-3 glow-text">👥 PLAYERS</h3>
-        <div class="space-y-2 text-sm" id="activePlayers">
-            <p class="text-cyan-300">🌊 Coral Team: <span id="coralStatus">Waiting...</span></p>
-            <p class="text-purple-300">⚡ Storm Team: <span id="stormStatus">Waiting...</span></p>
+    <!-- Active Players Panel -->
+    <div class="fixed bottom-4 right-4 bg-gradient-to-br from-gray-900 to-purple-900 text-white p-6 rounded-2xl shadow-2xl z-10 neon-border border-2 border-purple-400 max-h-[60vh] overflow-y-auto" id="playerPanel">
+        <h3 class="font-black text-xl mb-3 glow-text">👥 ACTIVE PLAYERS</h3>
+        <div class="space-y-2 text-sm" id="activePlayers"></div>
+    </div>
+
+    <!-- Controls Info -->
+    <div class="fixed bottom-4 left-4 bg-gradient-to-br from-gray-900 to-cyan-900 text-white p-6 rounded-2xl shadow-2xl z-10 neon-border border-2 border-cyan-400">
+        <h3 class="font-black text-xl mb-3 glow-text">⚡ CONTROLS</h3>
+        <div class="space-y-2 text-xs">
+            <p><strong class="text-cyan-300">P1:</strong> <span class="text-cyan-100">WASD</span></p>
+            <p><strong class="text-purple-300">P2:</strong> <span class="text-purple-100">Arrow Keys</span></p>
+            <p><strong class="text-green-300">P3:</strong> <span class="text-green-100">TFGH</span></p>
+            <p><strong class="text-yellow-300">P4:</strong> <span class="text-yellow-100">IJKL</span></p>
+            <p class="mt-3 pt-3 border-t border-cyan-700"><strong class="text-yellow-300">🏆:</strong> Score goals!</p>
         </div>
     </div>
 
     <canvas id="gameCanvas"></canvas>
 
     <script>
+        // ==================== STORAGE MANAGEMENT ====================
+        class StorageManager {
+            static saveGameData(data) {
+                localStorage.setItem('coralHockeyGame', JSON.stringify(data));
+            }
+
+            static loadGameData() {
+                const data = localStorage.getItem('coralHockeyGame');
+                return data ? JSON.parse(data) : null;
+            }
+
+            static clearGameData() {
+                localStorage.removeItem('coralHockeyGame');
+            }
+
+            static savePlayerStats(playerName, team, goals, assists) {
+                const stats = this.getPlayerStats();
+                const key = `${team}_${playerName}`;
+                
+                if (!stats[key]) {
+                    stats[key] = { name: playerName, team: team, goals: 0, assists: 0, gamesPlayed: 0 };
+                }
+                
+                stats[key].goals += goals;
+                stats[key].assists += assists;
+                stats[key].gamesPlayed += 1;
+                
+                localStorage.setItem('coralHockeyStats', JSON.stringify(stats));
+            }
+
+            static getPlayerStats() {
+                const stats = localStorage.getItem('coralHockeyStats');
+                return stats ? JSON.parse(stats) : {};
+            }
+        }
+
+        // ==================== GAME SETUP ====================
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const vsPlayerBtn = document.getElementById('vsPlayerBtn');
-        const vsComputerBtn = document.getElementById('vsComputerBtn');
-        const menuControls = document.getElementById('menuControls');
-        const gameStatus = document.getElementById('gameStatus');
-        const statusText = document.getElementById('statusText');
-        const coralScoreEl = document.getElementById('coralScore');
-        const stormScoreEl = document.getElementById('stormScore');
-        const coralStatusEl = document.getElementById('coralStatus');
-        const stormStatusEl = document.getElementById('stormStatus');
+        const setupModal = document.getElementById('setupModal');
+        const setupGameBtn = document.getElementById('setupGameBtn');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const cancelSetupBtn = document.getElementById('cancelSetupBtn');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        const addCoralPlayer = document.getElementById('addCoralPlayer');
+        const addStormPlayer = document.getElementById('addStormPlayer');
+        const coralPlayersList = document.getElementById('coralPlayersList');
+        const stormPlayersList = document.getElementById('stormPlayersList');
+        const coralAICheckbox = document.getElementById('coralAI');
+        const stormAICheckbox = document.getElementById('stormAI');
 
-        // Set canvas size
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -114,21 +209,279 @@
 
         // Game state
         let gameStarted = false;
-        let gameMode = null; // 'player' or 'computer'
         let coralScore = 0;
         let stormScore = 0;
         let particles = [];
+        let coralPlayers = [];
+        let stormPlayers = [];
+        let allPlayers = [];
+        let aiPlayers = [];
 
-        // Particle system for effects
+        // Control schemes for up to 4 players per team
+        const controlSchemes = [
+            { w: 'w', a: 'a', s: 's', d: 'd', name: 'WASD' },
+            { w: 'ArrowUp', a: 'ArrowLeft', s: 'ArrowDown', d: 'ArrowRight', name: 'Arrows' },
+            { w: 't', a: 'f', s: 'g', d: 'h', name: 'TFGH' },
+            { w: 'i', a: 'j', s: 'k', d: 'l', name: 'IJKL' }
+        ];
+
+        // Player colors
+        const coralColors = [
+            { main: '#06b6d4', accent: '#ff6b9d' },
+            { main: '#0ea5e9', accent: '#f472b6' },
+            { main: '#14b8a6', accent: '#fb7185' },
+            { main: '#22d3ee', accent: '#fda4af' }
+        ];
+
+        const stormColors = [
+            { main: '#a855f7', accent: '#fbbf24' },
+            { main: '#9333ea', accent: '#fcd34d' },
+            { main: '#c084fc', accent: '#facc15' },
+            { main: '#d946ef', accent: '#fde047' }
+        ];
+
+        // Puck
+        const puck = {
+            x: 0, y: 0,
+            radius: 15,
+            vx: 0, vy: 0,
+            friction: 0.98,
+            color: '#1a1a1a',
+            trail: []
+        };
+
+        // Goals
+        const goalWidth = 25;
+        const goalHeight = 160;
+        const leftGoal = { x: 0, y: 0, width: goalWidth, height: goalHeight };
+        const rightGoal = { x: 0, y: 0, width: goalWidth, height: goalHeight };
+
+        // ==================== MODAL MANAGEMENT ====================
+        setupGameBtn.addEventListener('click', () => {
+            setupModal.classList.remove('hidden');
+            loadSavedPlayers();
+        });
+
+        cancelSetupBtn.addEventListener('click', () => {
+            setupModal.classList.add('hidden');
+        });
+
+        clearDataBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all saved data?')) {
+                StorageManager.clearGameData();
+                localStorage.removeItem('coralHockeyStats');
+                coralPlayersList.innerHTML = '';
+                stormPlayersList.innerHTML = '';
+                alert('All data cleared!');
+            }
+        });
+
+        addCoralPlayer.addEventListener('click', () => addPlayerInput('coral'));
+        addStormPlayer.addEventListener('click', () => addPlayerInput('storm'));
+
+        function addPlayerInput(team) {
+            const list = team === 'coral' ? coralPlayersList : stormPlayersList;
+            const count = list.children.length;
+            
+            if (count >= 4) {
+                alert(`Maximum 4 players per team!`);
+                return;
+            }
+
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'flex gap-2';
+            playerDiv.innerHTML = `
+                <input type="text" 
+                       placeholder="Player ${count + 1} name" 
+                       class="flex-1 px-3 py-2 rounded-lg bg-gray-800 text-white border-2 ${team === 'coral' ? 'border-cyan-400' : 'border-purple-400'} focus:outline-none focus:ring-2"
+                       maxlength="15">
+                <button class="remove-player bg-red-500 hover:bg-red-400 px-3 py-2 rounded-lg font-bold">❌</button>
+            `;
+
+            playerDiv.querySelector('.remove-player').addEventListener('click', () => {
+                playerDiv.remove();
+            });
+
+            list.appendChild(playerDiv);
+        }
+
+        function loadSavedPlayers() {
+            const savedData = StorageManager.loadGameData();
+            if (savedData) {
+                coralPlayersList.innerHTML = '';
+                stormPlayersList.innerHTML = '';
+                
+                savedData.coralPlayers?.forEach(name => {
+                    addPlayerInput('coral');
+                    const inputs = coralPlayersList.querySelectorAll('input');
+                    inputs[inputs.length - 1].value = name;
+                });
+
+                savedData.stormPlayers?.forEach(name => {
+                    addPlayerInput('storm');
+                    const inputs = stormPlayersList.querySelectorAll('input');
+                    inputs[inputs.length - 1].value = name;
+                });
+
+                coralAICheckbox.checked = savedData.coralAI || false;
+                stormAICheckbox.checked = savedData.stormAI || false;
+            }
+        }
+
+        startGameBtn.addEventListener('click', () => {
+            const coralNames = Array.from(coralPlayersList.querySelectorAll('input'))
+                .map(input => input.value.trim())
+                .filter(name => name.length > 0);
+            
+            const stormNames = Array.from(stormPlayersList.querySelectorAll('input'))
+                .map(input => input.value.trim())
+                .filter(name => name.length > 0);
+
+            if (coralNames.length === 0 && stormNames.length === 0 && !coralAICheckbox.checked && !stormAICheckbox.checked) {
+                alert('Please add at least one player or AI!');
+                return;
+            }
+
+            // Save game setup
+            StorageManager.saveGameData({
+                coralPlayers: coralNames,
+                stormPlayers: stormNames,
+                coralAI: coralAICheckbox.checked,
+                stormAI: stormAICheckbox.checked
+            });
+
+            initializeGame(coralNames, stormNames, coralAICheckbox.checked, stormAICheckbox.checked);
+            setupModal.classList.add('hidden');
+        });
+
+        // ==================== GAME INITIALIZATION ====================
+        function initializeGame(coralNames, stormNames, coralAI, stormAI) {
+            coralPlayers = [];
+            stormPlayers = [];
+            allPlayers = [];
+            aiPlayers = [];
+
+            // Create Coral team players
+            coralNames.forEach((name, index) => {
+                const player = createPlayer(name, 'coral', index, coralColors[index], controlSchemes[index]);
+                coralPlayers.push(player);
+                allPlayers.push(player);
+            });
+
+            // Create Storm team players
+            stormNames.forEach((name, index) => {
+                const player = createPlayer(name, 'storm', index, stormColors[index], controlSchemes[index]);
+                stormPlayers.push(player);
+                allPlayers.push(player);
+            });
+
+            // Add AI players
+            if (coralAI) {
+                const aiPlayer = createPlayer('🤖 Coral AI', 'coral', coralPlayers.length, coralColors[coralPlayers.length % 4], null);
+                aiPlayer.isAI = true;
+                coralPlayers.push(aiPlayer);
+                allPlayers.push(aiPlayer);
+                aiPlayers.push(aiPlayer);
+            }
+
+            if (stormAI) {
+                const aiPlayer = createPlayer('🤖 Storm AI', 'storm', stormPlayers.length, stormColors[stormPlayers.length % 4], null);
+                aiPlayer.isAI = true;
+                stormPlayers.push(aiPlayer);
+                allPlayers.push(aiPlayer);
+                aiPlayers.push(aiPlayer);
+            }
+
+            // Position players
+            positionPlayers();
+
+            // Reset puck
+            puck.x = canvas.width / 2;
+            puck.y = canvas.height / 2;
+            puck.vx = 0;
+            puck.vy = 0;
+            puck.trail = [];
+
+            // Update UI
+            updatePlayerCounts();
+            updateActivePlayersList();
+
+            // Start game
+            gameStarted = true;
+            document.getElementById('menuControls').classList.add('hidden');
+            document.getElementById('gameStatus').classList.remove('hidden');
+            document.getElementById('statusText').textContent = 'GAME ON! 🏒';
+        }
+
+        function createPlayer(name, team, index, colors, controls) {
+            return {
+                name: name,
+                team: team,
+                x: 0,
+                y: 0,
+                radius: 28,
+                speed: 5.5,
+                color: colors.main,
+                accentColor: colors.accent,
+                controls: controls,
+                keys: controls ? { w: false, a: false, s: false, d: false } : null,
+                isAI: false,
+                aiTarget: { x: 0, y: 0 },
+                aiLastUpdate: 0
+            };
+        }
+
+        function positionPlayers() {
+            const headerOffset = 180;
+            const playAreaHeight = canvas.height - headerOffset;
+            
+            // Position Coral team on left side
+            coralPlayers.forEach((player, index) => {
+                player.x = canvas.width * 0.25;
+                player.y = headerOffset + playAreaHeight * ((index + 1) / (coralPlayers.length + 1));
+            });
+
+            // Position Storm team on right side
+            stormPlayers.forEach((player, index) => {
+                player.x = canvas.width * 0.75;
+                player.y = headerOffset + playAreaHeight * ((index + 1) / (stormPlayers.length + 1));
+            });
+        }
+
+        function updatePlayerCounts() {
+            document.getElementById('coralPlayerCount').textContent = `${coralPlayers.length} player${coralPlayers.length !== 1 ? 's' : ''}`;
+            document.getElementById('stormPlayerCount').textContent = `${stormPlayers.length} player${stormPlayers.length !== 1 ? 's' : ''}`;
+        }
+
+        function updateActivePlayersList() {
+            const list = document.getElementById('activePlayers');
+            list.innerHTML = '';
+
+            coralPlayers.forEach(player => {
+                const div = document.createElement('div');
+                div.className = 'text-cyan-300';
+                div.textContent = `🌊 ${player.name}${player.isAI ? '' : ` (${player.controls.name})`}`;
+                list.appendChild(div);
+            });
+
+            stormPlayers.forEach(player => {
+                const div = document.createElement('div');
+                div.className = 'text-purple-300';
+                div.textContent = `⚡ ${player.name}${player.isAI ? '' : ` (${player.controls.name})`}`;
+                list.appendChild(div);
+            });
+        }
+
+        // ==================== PARTICLE SYSTEM ====================
         class Particle {
             constructor(x, y, color) {
                 this.x = x;
                 this.y = y;
-                this.vx = (Math.random() - 0.5) * 8;
-                this.vy = (Math.random() - 0.5) * 8;
+                this.vx = (Math.random() - 0.5) * 10;
+                this.vy = (Math.random() - 0.5) * 10;
                 this.life = 1;
                 this.decay = 0.02;
-                this.size = Math.random() * 4 + 2;
+                this.size = Math.random() * 5 + 2;
                 this.color = color;
             }
 
@@ -150,186 +503,95 @@
             }
         }
 
-        // Game objects
-        const puck = {
-            x: canvas.width / 2,
-            y: canvas.height / 2,
-            radius: 15,
-            vx: 0,
-            vy: 0,
-            friction: 0.98,
-            color: '#1a1a1a',
-            trail: []
-        };
+        // ==================== INPUT HANDLING ====================
+        document.addEventListener('keydown', (e) => {
+            if (!gameStarted) return;
+            
+            allPlayers.forEach(player => {
+                if (player.isAI || !player.controls) return;
+                
+                if (e.key === player.controls.w) player.keys.w = true;
+                if (e.key === player.controls.a) player.keys.a = true;
+                if (e.key === player.controls.s) player.keys.s = true;
+                if (e.key === player.controls.d) player.keys.d = true;
+            });
+        });
 
-        const coralPlayer = {
-            x: canvas.width / 4,
-            y: canvas.height / 2,
-            radius: 28,
-            speed: 5.5,
-            color: '#06b6d4',
-            accentColor: '#ff6b9d',
-            keys: { w: false, a: false, s: false, d: false },
-            name: 'Coral'
-        };
+        document.addEventListener('keyup', (e) => {
+            allPlayers.forEach(player => {
+                if (player.isAI || !player.controls) return;
+                
+                if (e.key === player.controls.w) player.keys.w = false;
+                if (e.key === player.controls.a) player.keys.a = false;
+                if (e.key === player.controls.s) player.keys.s = false;
+                if (e.key === player.controls.d) player.keys.d = false;
+            });
+        });
 
-        const stormPlayer = {
-            x: (canvas.width / 4) * 3,
-            y: canvas.height / 2,
-            radius: 28,
-            speed: 5.5,
-            color: '#a855f7',
-            accentColor: '#fbbf24',
-            keys: { up: false, left: false, down: false, right: false },
-            name: 'Storm',
-            isAI: false
-        };
-
-        // AI behavior
-        const ai = {
-            updateInterval: 50, // ms between AI decisions
-            lastUpdate: 0,
-            targetX: 0,
-            targetY: 0,
-            reactDistance: 300
-        };
-
-        function updateAI() {
-            if (!stormPlayer.isAI || !gameStarted) return;
-
+        // ==================== AI SYSTEM ====================
+        function updateAI(player) {
             const now = Date.now();
-            if (now - ai.lastUpdate < ai.updateInterval) return;
-            ai.lastUpdate = now;
+            if (now - player.aiLastUpdate < 50) return;
+            player.aiLastUpdate = now;
 
-            // Calculate distance to puck
-            const dx = puck.x - stormPlayer.x;
-            const dy = puck.y - stormPlayer.y;
+            const dx = puck.x - player.x;
+            const dy = puck.y - player.y;
             const distanceToPuck = Math.sqrt(dx * dx + dy * dy);
 
-            // Defensive position
-            const defensiveX = canvas.width * 0.75;
+            // Determine defensive position based on team
+            const defensiveX = player.team === 'coral' ? canvas.width * 0.3 : canvas.width * 0.7;
             const defensiveY = canvas.height / 2;
 
-            if (distanceToPuck < ai.reactDistance || puck.x > canvas.width / 2) {
-                // Chase puck if it's close or on their side
-                ai.targetX = puck.x;
-                ai.targetY = puck.y;
+            // Decide target
+            const shouldChasePuck = (player.team === 'coral' && puck.x < canvas.width / 2) ||
+                                   (player.team === 'storm' && puck.x > canvas.width / 2) ||
+                                   distanceToPuck < 250;
+
+            if (shouldChasePuck) {
+                player.aiTarget.x = puck.x;
+                player.aiTarget.y = puck.y;
             } else {
-                // Return to defensive position
-                ai.targetX = defensiveX;
-                ai.targetY = defensiveY;
+                player.aiTarget.x = defensiveX;
+                player.aiTarget.y = defensiveY;
             }
 
             // Move towards target
-            const targetDx = ai.targetX - stormPlayer.x;
-            const targetDy = ai.targetY - stormPlayer.y;
+            const targetDx = player.aiTarget.x - player.x;
+            const targetDy = player.aiTarget.y - player.y;
             const distanceToTarget = Math.sqrt(targetDx * targetDx + targetDy * targetDy);
 
-            // Clear all keys first
-            stormPlayer.keys.up = false;
-            stormPlayer.keys.down = false;
-            stormPlayer.keys.left = false;
-            stormPlayer.keys.right = false;
+            if (!player.keys) player.keys = { w: false, a: false, s: false, d: false };
+            
+            player.keys.w = false;
+            player.keys.s = false;
+            player.keys.a = false;
+            player.keys.d = false;
 
             if (distanceToTarget > 20) {
                 if (Math.abs(targetDx) > Math.abs(targetDy)) {
-                    stormPlayer.keys.right = targetDx > 0;
-                    stormPlayer.keys.left = targetDx < 0;
+                    player.keys.d = targetDx > 0;
+                    player.keys.a = targetDx < 0;
                 } else {
-                    stormPlayer.keys.down = targetDy > 0;
-                    stormPlayer.keys.up = targetDy < 0;
+                    player.keys.s = targetDy > 0;
+                    player.keys.w = targetDy < 0;
                 }
             }
         }
 
-        // Goals
-        const goalWidth = 25;
-        const goalHeight = 160;
-        const leftGoal = {
-            x: 0,
-            y: (canvas.height - goalHeight) / 2,
-            width: goalWidth,
-            height: goalHeight
-        };
-        const rightGoal = {
-            x: canvas.width - goalWidth,
-            y: (canvas.height - goalHeight) / 2,
-            width: goalWidth,
-            height: goalHeight
-        };
-
-        // Keyboard controls
-        document.addEventListener('keydown', (e) => {
-            if (!gameStarted) return;
-            
-            // Player 1 (Coral)
-            if (e.key === 'w') coralPlayer.keys.w = true;
-            if (e.key === 'a') coralPlayer.keys.a = true;
-            if (e.key === 's') coralPlayer.keys.s = true;
-            if (e.key === 'd') coralPlayer.keys.d = true;
-            
-            // Player 2 (Storm) - only if not AI
-            if (!stormPlayer.isAI) {
-                if (e.key === 'ArrowUp') stormPlayer.keys.up = true;
-                if (e.key === 'ArrowLeft') stormPlayer.keys.left = true;
-                if (e.key === 'ArrowDown') stormPlayer.keys.down = true;
-                if (e.key === 'ArrowRight') stormPlayer.keys.right = true;
-            }
-        });
-
-        document.addEventListener('keyup', (e) => {
-            // Player 1 (Coral)
-            if (e.key === 'w') coralPlayer.keys.w = false;
-            if (e.key === 'a') coralPlayer.keys.a = false;
-            if (e.key === 's') coralPlayer.keys.s = false;
-            if (e.key === 'd') coralPlayer.keys.d = false;
-            
-            // Player 2 (Storm) - only if not AI
-            if (!stormPlayer.isAI) {
-                if (e.key === 'ArrowUp') stormPlayer.keys.up = false;
-                if (e.key === 'ArrowLeft') stormPlayer.keys.left = false;
-                if (e.key === 'ArrowDown') stormPlayer.keys.down = false;
-                if (e.key === 'ArrowRight') stormPlayer.keys.right = false;
-            }
-        });
-
-        // Game mode selection
-        vsPlayerBtn.addEventListener('click', () => {
-            gameMode = 'player';
-            stormPlayer.isAI = false;
-            startGame();
-        });
-
-        vsComputerBtn.addEventListener('click', () => {
-            gameMode = 'computer';
-            stormPlayer.isAI = true;
-            startGame();
-        });
-
-        function startGame() {
-            gameStarted = true;
-            menuControls.classList.add('hidden');
-            gameStatus.classList.remove('hidden');
-            
-            coralStatusEl.textContent = 'Human Player';
-            stormStatusEl.textContent = stormPlayer.isAI ? '🤖 AI Player' : 'Human Player';
-            
-            statusText.textContent = `${gameMode === 'player' ? 'VS PLAYER' : 'VS COMPUTER'} MODE`;
-            
-            setTimeout(() => {
-                statusText.textContent = 'GAME ON! 🏒';
-            }, 1500);
-        }
-
+        // ==================== GAME LOGIC ====================
         function updatePlayer(player) {
-            // Update based on key states
-            if (player.keys.w || player.keys.up) player.y -= player.speed;
-            if (player.keys.s || player.keys.down) player.y += player.speed;
-            if (player.keys.a || player.keys.left) player.x -= player.speed;
-            if (player.keys.d || player.keys.right) player.x += player.speed;
+            if (player.isAI) {
+                updateAI(player);
+            }
 
-            // Keep player in bounds
-            const headerOffset = 150;
+            if (player.keys) {
+                if (player.keys.w) player.y -= player.speed;
+                if (player.keys.s) player.y += player.speed;
+                if (player.keys.a) player.x -= player.speed;
+                if (player.keys.d) player.x += player.speed;
+            }
+
+            const headerOffset = 180;
             player.x = Math.max(player.radius, Math.min(canvas.width - player.radius, player.x));
             player.y = Math.max(headerOffset + player.radius, Math.min(canvas.height - player.radius, player.y));
         }
@@ -341,7 +603,7 @@
             return distance < obj1.radius + obj2.radius;
         }
 
-        function handlePlayerPuckCollision(player, puck) {
+        function handlePlayerPuckCollision(player) {
             if (checkCollision(player, puck)) {
                 const dx = puck.x - player.x;
                 const dy = puck.y - player.y;
@@ -351,18 +613,15 @@
                     const normalX = dx / distance;
                     const normalY = dy / distance;
                     
-                    // Push puck away from player
                     const overlap = player.radius + puck.radius - distance;
                     puck.x += normalX * overlap;
                     puck.y += normalY * overlap;
                     
-                    // Transfer momentum to puck
                     const force = 10;
                     puck.vx = normalX * force;
                     puck.vy = normalY * force;
 
-                    // Create particles on hit
-                    for (let i = 0; i < 10; i++) {
+                    for (let i = 0; i < 8; i++) {
                         particles.push(new Particle(puck.x, puck.y, player.color));
                     }
                 }
@@ -370,28 +629,23 @@
         }
 
         function updatePuck() {
-            // Add trail
             puck.trail.push({ x: puck.x, y: puck.y });
-            if (puck.trail.length > 15) puck.trail.shift();
+            if (puck.trail.length > 12) puck.trail.shift();
 
             puck.x += puck.vx;
             puck.y += puck.vy;
             
-            // Apply friction
             puck.vx *= puck.friction;
             puck.vy *= puck.friction;
             
-            // Stop if moving very slowly
             if (Math.abs(puck.vx) < 0.1) puck.vx = 0;
             if (Math.abs(puck.vy) < 0.1) puck.vy = 0;
             
-            // Bounce off top and bottom walls
-            const headerOffset = 150;
+            const headerOffset = 180;
             if (puck.y - puck.radius < headerOffset || puck.y + puck.radius > canvas.height) {
                 puck.vy *= -0.8;
                 puck.y = puck.y - puck.radius < headerOffset ? headerOffset + puck.radius : canvas.height - puck.radius;
                 
-                // Bounce particles
                 for (let i = 0; i < 5; i++) {
                     particles.push(new Particle(puck.x, puck.y, '#ffffff'));
                 }
@@ -401,8 +655,8 @@
             if (puck.x - puck.radius < goalWidth) {
                 if (puck.y > leftGoal.y && puck.y < leftGoal.y + leftGoal.height) {
                     stormScore++;
-                    stormScoreEl.textContent = stormScore;
-                    celebrateGoal(stormPlayer.color);
+                    document.getElementById('stormScore').textContent = stormScore;
+                    celebrateGoal('storm');
                     resetPuck();
                 } else {
                     puck.vx *= -0.8;
@@ -413,8 +667,8 @@
             if (puck.x + puck.radius > canvas.width - goalWidth) {
                 if (puck.y > rightGoal.y && puck.y < rightGoal.y + rightGoal.height) {
                     coralScore++;
-                    coralScoreEl.textContent = coralScore;
-                    celebrateGoal(coralPlayer.color);
+                    document.getElementById('coralScore').textContent = coralScore;
+                    celebrateGoal('coral');
                     resetPuck();
                 } else {
                     puck.vx *= -0.8;
@@ -423,15 +677,15 @@
             }
         }
 
-        function celebrateGoal(color) {
-            // Create goal celebration particles
-            for (let i = 0; i < 100; i++) {
+        function celebrateGoal(team) {
+            for (let i = 0; i < 150; i++) {
+                const color = team === 'coral' ? '#06b6d4' : '#a855f7';
                 particles.push(new Particle(canvas.width / 2, canvas.height / 2, color));
             }
-            statusText.textContent = '⚡ GOAL! ⚡';
+            document.getElementById('statusText').textContent = `⚡ ${team.toUpperCase()} TEAM SCORES! ⚡`;
             setTimeout(() => {
-                statusText.textContent = 'GAME ON! 🏒';
-            }, 2000);
+                document.getElementById('statusText').textContent = 'GAME ON! 🏒';
+            }, 2500);
         }
 
         function resetPuck() {
@@ -442,10 +696,14 @@
             puck.trail = [];
         }
 
+        // ==================== RENDERING ====================
         function drawRink() {
-            const headerOffset = 150;
+            const headerOffset = 180;
             
-            // Ice rink with gradient
+            leftGoal.y = (canvas.height - goalHeight) / 2;
+            rightGoal.x = canvas.width - goalWidth;
+            rightGoal.y = (canvas.height - goalHeight) / 2;
+            
             const gradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
             gradient.addColorStop(0, '#f0f9ff');
             gradient.addColorStop(0.5, '#e0f2fe');
@@ -453,7 +711,7 @@
             ctx.fillStyle = gradient;
             ctx.fillRect(0, headerOffset, canvas.width, canvas.height - headerOffset);
             
-            // Blue lines (defensive zones)
+            // Blue lines
             ctx.strokeStyle = '#0284c7';
             ctx.lineWidth = 4;
             ctx.beginPath();
@@ -466,7 +724,7 @@
             ctx.lineTo(canvas.width * 0.75, canvas.height);
             ctx.stroke();
             
-            // Center line with dotted pattern
+            // Center line
             ctx.strokeStyle = '#dc2626';
             ctx.lineWidth = 5;
             ctx.setLineDash([20, 15]);
@@ -483,50 +741,26 @@
             ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, Math.PI * 2);
             ctx.stroke();
             
-            // Center dot
             ctx.fillStyle = '#dc2626';
             ctx.beginPath();
             ctx.arc(canvas.width / 2, canvas.height / 2, 8, 0, Math.PI * 2);
             ctx.fill();
             
-            // Face-off circles
-            drawFaceoffCircle(canvas.width * 0.25, canvas.height * 0.35);
-            drawFaceoffCircle(canvas.width * 0.25, canvas.height * 0.65);
-            drawFaceoffCircle(canvas.width * 0.75, canvas.height * 0.35);
-            drawFaceoffCircle(canvas.width * 0.75, canvas.height * 0.65);
-            
-            // Goals with fancy design
-            drawGoal(leftGoal, coralPlayer.color);
-            drawGoal(rightGoal, stormPlayer.color);
-        }
-
-        function drawFaceoffCircle(x, y) {
-            ctx.strokeStyle = '#dc2626';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(x, y, 30, 0, Math.PI * 2);
-            ctx.stroke();
-            
-            ctx.fillStyle = '#dc2626';
-            ctx.beginPath();
-            ctx.arc(x, y, 5, 0, Math.PI * 2);
-            ctx.fill();
+            // Goals
+            drawGoal(leftGoal, '#06b6d4');
+            drawGoal(rightGoal, '#a855f7');
         }
 
         function drawGoal(goal, color) {
-            // Goal net effect
             ctx.fillStyle = color;
             ctx.globalAlpha = 0.3;
             ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
             ctx.globalAlpha = 1;
             
-            // Goal frame
             ctx.strokeStyle = color;
             ctx.lineWidth = 6;
             ctx.strokeRect(goal.x, goal.y, goal.width, goal.height);
             
-            // Net pattern
-            ctx.strokeStyle = color;
             ctx.lineWidth = 2;
             ctx.globalAlpha = 0.5;
             for (let i = 0; i < goal.height; i += 20) {
@@ -539,22 +773,22 @@
         }
 
         function drawPlayer(player) {
-            // Glow effect
-            const glowGradient = ctx.createRadialGradient(player.x, player.y, player.radius * 0.5, player.x, player.y, player.radius * 2);
-            glowGradient.addColorStop(0, player.color + '80');
+            // Glow
+            const glowGradient = ctx.createRadialGradient(player.x, player.y, player.radius * 0.5, player.x, player.y, player.radius * 2.5);
+            glowGradient.addColorStop(0, player.color + '60');
             glowGradient.addColorStop(1, player.color + '00');
             ctx.fillStyle = glowGradient;
             ctx.beginPath();
-            ctx.arc(player.x, player.y, player.radius * 2, 0, Math.PI * 2);
+            ctx.arc(player.x, player.y, player.radius * 2.5, 0, Math.PI * 2);
             ctx.fill();
             
-            // Player shadow
+            // Shadow
             ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
             ctx.beginPath();
             ctx.arc(player.x + 4, player.y + 4, player.radius, 0, Math.PI * 2);
             ctx.fill();
             
-            // Player body with gradient
+            // Body
             const playerGradient = ctx.createRadialGradient(player.x - 5, player.y - 5, 0, player.x, player.y, player.radius);
             playerGradient.addColorStop(0, player.accentColor);
             playerGradient.addColorStop(1, player.color);
@@ -563,43 +797,46 @@
             ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
             ctx.fill();
             
-            // Player outline
             ctx.strokeStyle = 'white';
             ctx.lineWidth = 4;
             ctx.stroke();
             
-            // Inner detail
             ctx.strokeStyle = player.accentColor;
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.arc(player.x, player.y, player.radius * 0.6, 0, Math.PI * 2);
             ctx.stroke();
+
+            // Name tag
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(player.x - 30, player.y - player.radius - 20, 60, 16);
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 10px Orbitron';
+            ctx.textAlign = 'center';
+            ctx.fillText(player.name.substring(0, 10), player.x, player.y - player.radius - 8);
         }
 
         function drawPuck() {
-            // Puck trail
+            // Trail
             ctx.strokeStyle = '#1a1a1a';
             ctx.lineWidth = 2;
             ctx.globalAlpha = 0.3;
             ctx.beginPath();
             for (let i = 0; i < puck.trail.length; i++) {
                 const point = puck.trail[i];
-                if (i === 0) {
-                    ctx.moveTo(point.x, point.y);
-                } else {
-                    ctx.lineTo(point.x, point.y);
-                }
+                if (i === 0) ctx.moveTo(point.x, point.y);
+                else ctx.lineTo(point.x, point.y);
             }
             ctx.stroke();
             ctx.globalAlpha = 1;
             
-            // Puck shadow
+            // Shadow
             ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
             ctx.beginPath();
             ctx.arc(puck.x + 3, puck.y + 3, puck.radius, 0, Math.PI * 2);
             ctx.fill();
             
-            // Puck glow
+            // Glow
             const puckGlow = ctx.createRadialGradient(puck.x, puck.y, 0, puck.x, puck.y, puck.radius * 2);
             puckGlow.addColorStop(0, '#ffffff40');
             puckGlow.addColorStop(1, '#ffffff00');
@@ -608,21 +845,14 @@
             ctx.arc(puck.x, puck.y, puck.radius * 2, 0, Math.PI * 2);
             ctx.fill();
             
-            // Puck body
+            // Body
             ctx.fillStyle = puck.color;
             ctx.beginPath();
             ctx.arc(puck.x, puck.y, puck.radius, 0, Math.PI * 2);
             ctx.fill();
             
-            // Puck details
             ctx.strokeStyle = '#666';
             ctx.lineWidth = 3;
-            ctx.stroke();
-            
-            ctx.strokeStyle = '#999';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.arc(puck.x, puck.y, puck.radius * 0.5, 0, Math.PI * 2);
             ctx.stroke();
         }
 
@@ -639,43 +869,27 @@
             particles.forEach(particle => particle.draw());
         }
 
+        // ==================== GAME LOOP ====================
         function gameLoop() {
-            // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Draw rink
             drawRink();
             
             if (gameStarted) {
-                // Update AI
-                updateAI();
-                
-                // Update players
-                updatePlayer(coralPlayer);
-                updatePlayer(stormPlayer);
-                
-                // Update puck
+                allPlayers.forEach(updatePlayer);
                 updatePuck();
-                
-                // Check collisions
-                handlePlayerPuckCollision(coralPlayer, puck);
-                handlePlayerPuckCollision(stormPlayer, puck);
-                
-                // Update particles
+                allPlayers.forEach(handlePlayerPuckCollision);
                 updateParticles();
             }
             
-            // Draw game objects
             drawParticles();
             drawPuck();
-            drawPlayer(coralPlayer);
-            drawPlayer(stormPlayer);
+            allPlayers.forEach(drawPlayer);
             
             requestAnimationFrame(gameLoop);
         }
 
-        // Start game loop
         gameLoop();
     </script>
 </body>
-</html>
+</html>a
